@@ -343,6 +343,8 @@ def buttonFolderAScan():
             print("Thanks for flying scan media folder")
             textFolderA.insert("end", f"Aborted by user\n")
             textFolderA.insert("end", f"Thanks for flying scan media folder\n")
+    print("Run completed")
+    textFolderA.insert("end", f"Run completed\n")
     return
 
 def buttonDirDialogFolderA():
@@ -356,7 +358,7 @@ def buttonDirDialogFolderA():
     textFolderA.insert("end", f"Scan Folder set to: \n{__folder_selected} \n")
 
 def getLastestCompFolderA():
-    __latestCompFolderAFile = os.path.join(os.getcwd(), "latest_comp_folder_a.txt")
+    __latestCompFolderAFile = os.path.join(os.getcwd(), "latest_comp_folder.txt")
     __latestCompFolderA = None
     if os.path.exists(__latestCompFolderAFile):
         __latestCompFolderAFp = open(__latestCompFolderAFile, 'r')
@@ -366,22 +368,24 @@ def getLastestCompFolderA():
     return __latestCompFolderA
 
 def writeLastestCompFolderA(CompFolderA):
-    __latestCompFolderAFile = os.path.join(os.getcwd(), "latest_comp_folder_a.txt")
+    __latestCompFolderAFile = os.path.join(os.getcwd(), "latest_comp_folder.txt")
     __latestCompFolderA = None
     print(f"writeLastestCompFolderA({CompFolderA})")
     print(f"writeLastestCompFolderA:__latestCompFolderAFile:{__latestCompFolderAFile})")
-    if os.path.exists(__latestCompFolderAFile):
-        __latestCompFolderAFp = open(__latestCompFolderAFile, 'w')
-        __latestCompFolderAFp.write(CompFolderA)
-        __latestCompFolderAFp.close()
-        print(f"written {CompFolderA} to {__latestCompFolderAFile}")
+    # if os.path.exists(__latestCompFolderAFile):
+    __latestCompFolderAFp = open(__latestCompFolderAFile, 'w')
+    __latestCompFolderAFp.write(CompFolderA)
+    __latestCompFolderAFp.close()
+    print(f"written {CompFolderA} to {__latestCompFolderAFile}")
     return __latestCompFolderA
 
 def getVerion():
-    __versionFile = os.path.join(os.getcwd(), "version_media_scan_folder.txt")
-    __versionFp = open(__versionFile, 'r')
-    __version = __versionFp.readline()
-    return __version
+    # __versionFile = os.path.join(os.getcwd(), "version_media_scan_folder.txt")
+    # __versionFp = open(__versionFile, 'r')
+    # __version = __versionFp.readline()
+    # return __version
+    return "2.2.1"
+
 
 def getListIncorrectLocations(rootFolder, sortedList):
     __lstIncorrectLocations = []
@@ -456,5 +460,4 @@ if getLastestCompFolderA() is not None:
     entrySrcFolderA.insert(0, getLastestCompFolderA())
 else:
     entrySrcFolderA.insert(0, "C:\\Prive\\fotos_unprocessed")
-
 main.mainloop()

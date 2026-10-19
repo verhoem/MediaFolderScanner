@@ -14,4 +14,8 @@ yyyymmdd_ related to modification time of file.
 
 If scan runs into files that are not according to this location / naming user is asked to correct them.
 
+Make executable with :
+
+py -m pip install pyinstaller
+py -m PyInstaller --onefile --windowed --name MediaFolderScanner .\Scan_media_folder.py`chmod +x MediaFolderScanner.py` and run with `./MediaFolderScanner.py` or `python3 MediaFolderScanner.py`
 
