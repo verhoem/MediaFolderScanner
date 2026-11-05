@@ -29,6 +29,11 @@ def buttonFolderAScan():
     buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
     textFolderA.delete(1.0, "end")
     __folderA = entrySrcFolderA.get()
+    __logFile = os.path.join(__folderA, "media_scan_folder.log")
+    dtNow = datetime.datetime.now()
+    __fH = open(__logFile, 'a')
+    __fH.write(f"{dtNow}:Scan started in Folder:{__folderA}\n")
+    __fH.close()
     print(f"Scanning Folder {__folderA}")
     __textBox = f"Scanning Folder  {__folderA}\n"
     textFolderA.insert("end", __textBox)
@@ -59,6 +64,12 @@ def buttonFolderAScan():
     print(f"NR files found: {__nrFilesInFolder}" )
     print(f"NR subdirs found: {__nrSubdirsInFolder}" )
     print(f"NR files in ScannedFiles: {len(__ScannedFiles)}")
+    dtNow = datetime.datetime.now()
+    __fHlog = open(__logFile, 'a')
+    __fHlog.write(f"{dtNow}:NR files found: {__nrFilesInFolder}\n")
+    __fHlog.write(f"{dtNow}:NR subdirs found: {__nrSubdirsInFolder}\n")
+    __fHlog.write(f"{dtNow}:NR files in ScannedFiles: {len(__ScannedFiles)}\n")
+    __fHlog.close()
     __SortedBySize = sorted(__ScannedFiles, key=itemgetter(1))
     # To find duplicate files first find files same sizes before hashing for performance
     __index = 0
@@ -69,6 +80,11 @@ def buttonFolderAScan():
         __index += 1
     textFolderA.insert("end", f"NR files found: {__nrFilesInFolder} \n")
     textFolderA.insert("end", f"NR subdirs found: {__nrSubdirsInFolder} \n")
+    dtNow = datetime.datetime.now()
+    __fHlog = open(__logFile, 'a')
+    __fHlog.write(f"{dtNow}:NR files found: {__nrFilesInFolder} \n")
+    __fHlog.write(f"{dtNow}:NR subdirs found: {__nrSubdirsInFolder} \n")
+    __fHlog.close()
     if len(__listSizes) > 0:
         if DEBUG:
             print(f"DEBUG:__listSizes\nDEBUG:{__listSizes}")
@@ -84,6 +100,12 @@ def buttonFolderAScan():
             print(f"DEBUG:__dupSizes\n{__dupSizes}")
     textFolderA.insert("end", f"NR duplicate sizes found: {len(__dupSizes)} \n")
     textFolderA.insert("end", f"Expecting no duplicate files to be found\n")
+    dtNow = datetime.datetime.now()
+    __fHlog = open(__logFile, 'a')
+    __fHlog.write(f"{dtNow}:NR duplicate sizes found: {len(__dupSizes)} \n")
+    __fHlog.write(f"{dtNow}:Expecting no duplicate files to be found\n")
+    __fHlog.close()
+    __fHlog = open(__logFile, 'a')
     for size in __dupSizes:
         __indexSorted = 0
         while __indexSorted < len(__SortedBySize):
@@ -121,26 +143,29 @@ def buttonFolderAScan():
     if len(__dupHashes) > 0:
         if DEBUG:
             print(f"duplicate hashes found:\n{__dupHashes}")
-        pathDH = os.path.join(os.getcwd(), "Scan_Media_Folder_duplicate_hashes.txt")
-        fDH = open(pathDH, "w")
+        # pathDH = os.path.join(os.getcwd(), "Scan_Media_Folder_duplicate_hashes.txt")
+        # fDH = open(pathDH, "w")
         dtNow = datetime.datetime.now()
-        fDH.write(f"Folder scanned:{__folderA}\n")
-        fDH.write(f"Scan date:{dtNow}\n")
-        fDH.write(f"Duplicate hashes found:{len(__dupHashes)}\n")
+        __fHlog.write(f"Folder scanned:{__folderA}\n")
+        __fHlog.write(f"Scan date:{dtNow}\n")
+        __fHlog.write(f"Duplicate hashes found:{len(__dupHashes)}\n")
         for __hash in __dupHashes:
             __index = 0
             while __index < len(__SortedBySize):
                 if __SortedBySize[__index][2] == __hash:
                     __filePathTmp = os.path.join(__folderA, __SortedBySize[__index][0])
                     print(f"Duplicate:{__filePathTmp}:{__hash}")
-                    fDH.write(f"{__filePathTmp}:{__hash}\n")
+                    __fHlog.write(f"{__filePathTmp}:{__hash}\n")
                 __index += 1
         textFolderA.insert("end", f"Duplicate hashes found in Folder A Exiting!!\n")
-        fDH.close()
+        __fHlog.close()
         gl_folder_a_consistent = True
         return
     else:
         print(f"No duplicate hashes found in Folder A {__folderA}")
+        __fHlog = open(__logFile, 'a')
+        __fHlog.write(f"No duplicate hashes found in Folder A {__folderA}\n")
+        __fHlog.close()
         textFolderA.insert("end", f"No duplicate hashes found in Folder A {__folderA}\n")
         gl_folder_a_consistent = True
         gl_list_folder_a = __SortedBySize
@@ -205,55 +230,67 @@ def buttonFolderAScan():
                 __incorrectNamingLocations.append(__incorrectNamingLocation)
         __index += 1
     # Create file Scan_Media_Folder_Wrong_Location_Years.tx
-    PathWLY = os.path.join(os.getcwd(), "Scan_Media_Folder_Wrong_Location_Years.txt")
-    fWLY = open(PathWLY, "w")
+    __fHlog = open(__logFile, 'a')
+    # PathWLY = os.path.join(os.getcwd(), "Scan_Media_Folder_Wrong_Location_Years.txt")
+    # fWLY = open(PathWLY, "w")
     dtNow = datetime.datetime.now()
     # fWLY.write(f"Scan date:{getTimeStampNow()}\n")
-    fWLY.write(f"Folder scanned:{__folderA}\n")
-    fWLY.write(f"Scan date:{dtNow}\n")
-    fWLY.write(f"Wrong year locations:{len(__incorrectYearLocations)}\n\n")
+    __fHlog.write(f"Folder scanned:{__folderA}\n")
+    __fHlog.write(f"Scan date:{dtNow}\n")
+    __fHlog.write(f"Wrong year locations:{len(__incorrectYearLocations)}\n\n")
     if len(__incorrectYearLocations) > 0:
         textFolderA.insert("end", f"Incorrect Year locations found:{len(__incorrectYearLocations)}\n")
         __index = 0
         while __index < len(__incorrectYearLocations):
             if DEBUG:
                 print(f"DEBUG:{__index}:{__incorrectYearLocations[__index]}")
-            fWLY.write(f"{__index}:{__incorrectYearLocations[__index]}\n")
+            __fHlog.write(f"{__index}:{__incorrectYearLocations[__index]}\n")
             __index += 1
     else:
         print(f"No Incorrect Year location found")
+        __fHlog.write(f"No Incorrect Year location found")
         textFolderA.insert("end", f"No Incorrect Year locations found\n")
-    fWLY.close()
+    __fHlog.close()
     # Create file Scan_Media_Folder_Wrong_Location_Months.txt
-    PathWLM = os.path.join(os.getcwd(), "Scan_Media_Folder_Wrong_Location_Months.txt")
-    fWLM = open(PathWLM, "w")
+    __fHlog = open(__logFile, 'a')
+    # PathWLM = os.path.join(os.getcwd(), "Scan_Media_Folder_Wrong_Location_Months.txt")
+    # fWLM = open(PathWLM, "w")
     dtNow=datetime.datetime.now()
-    fWLM.write(f"Folder scanned:{__folderA}\n")
-    fWLM.write(f"Scan date:{dtNow}\n")
-    fWLM.write(f"Wrong month locations:{len(__incorrectMonthLocations)}\n")
+    __fHlog.write(f"{dtNow}:Folder scanned:{__folderA}\n")
+    __fHlog.write(f"{dtNow}:Scan date\n")
+    __fHlog.write(f"{dtNow}:Wrong month locations:{len(__incorrectMonthLocations)}\n")
     if len(__incorrectMonthLocations) > 0:
         textFolderA.insert("end", f"Incorrect Month locations found:{len(__incorrectMonthLocations)}\n")
         __index = 0
         while __index < len(__incorrectMonthLocations):
             if DEBUG:
                 print(f"DEBUG:{__index}:{__incorrectMonthLocations[__index]}")
-            fWLM.write(f"{__index}:{__incorrectMonthLocations[__index]}\n")
+            __fHlog.write(f"{dtNow}:{__index}:{__incorrectMonthLocations[__index]}\n")
             __index += 1
     else:
         print(f"No Incorrect Month location found")
+        __fHlog.write(f"{dtNow}:No Incorrect Month locations found\n")
         textFolderA.insert("end", f"No Incorrect Month locations found\n")
-    fWLM.close()
+    __fHlog.close()
     __lstIncorrectLocations = getListIncorrectLocations(__folderA, __SortedBySize)
     if len(__lstIncorrectLocations) == 0:
         print("No Incorrect Locations [YYYY/MM/File] found")
+        __fHlog = open(__logFile, 'a')
+        __fHlog.write(f"{dtNow}:No Incorrect Locations [YYYY/MM/File] found\n")
+        __fHlog.close()
         textFolderA.insert("end", f"No Incorrect Locations [YYYY/MM/File] found\n")
     if len(__lstIncorrectLocations) > 0:
         if messagebox.askyesno("InfoMV", f"{len(__lstIncorrectLocations)} Incorrect locations [YYYY/MM/File] found , correct ?"):
             __nrCorrectedLocations = 0
             print("User requested to correct locations")
+            __fHlog = open(__logFile, 'a')
+            __fHlog.write(f"{dtNow}:User requested to correct locations\n")
             __index = 0
             while __index < len(__lstIncorrectLocations):
                 print(f"{__index}:{__lstIncorrectLocations[__index][0]}:{__lstIncorrectLocations[__index][1]}:{__lstIncorrectLocations[__index][2]}")
+                __fHlog = open(__logFile, 'a')
+                __fHlog.write(f"{dtNow}:{__index}:{__lstIncorrectLocations[__index][0]}:{__lstIncorrectLocations[__index][1]}:{__lstIncorrectLocations[__index][2]}\n")
+                __fHlog.close()
                 __filePathSrc = os.path.join(__folderA, __lstIncorrectLocations[__index][0])
                 __fileNameSrc = os.path.basename(__filePathSrc)
                 __filePathDst = os.path.join(__folderA, __lstIncorrectLocations[__index][1], __lstIncorrectLocations[__index][2], __fileNameSrc)
@@ -261,6 +298,9 @@ def buttonFolderAScan():
                                                      f"Move:{__filePathSrc} \nTo: {__filePathDst} ?")
                 if __answer == None:
                     print("User aborted to correct locations")
+                    __fHlog = open(__logFile, 'a')
+                    __fHlog.write(f"{dtNow}:User aborted to correct locations\n")
+                    __fHlog.close()
                     textFolderA.insert("end", f"Correcting locations ({__nrCorrectedLocations}/{len(__lstIncorrectLocations)}) aborted by user\n")
                     textFolderA.insert("end", f"Thanks for flying scan media folder\n")
                     return
@@ -270,10 +310,18 @@ def buttonFolderAScan():
                         pathlib.Path(__dstDir).mkdir(parents=True, exist_ok=True)
                         if DEBUG:
                             print(f"DEBUG: os.rename({__filePathSrc}, {__filePathDst})")
+                        __fHlog = open(__logFile, 'a')
+                        __fHlog.write(f"{dtNow}:Corrected location:{__filePathSrc} to {__filePathDst}\n")
+                        __fHlog.close()
                         os.rename(__filePathSrc, __filePathDst)
                         __nrCorrectedLocations += 1
                 __index += 1
             print("Corrected incorrect locations, please re-run scan")
+            textFolderA.insert("end", f"Corrected incorrect locations, please re-run scan\n")
+            textFolderA.insert("end", f"Check log file {__logFile} for details\n")
+            __fHlog = open(__logFile, 'a')
+            __fHlog.write(f"{dtNow}:Corrected incorrect locations, please re-run scan\n")
+            __fHlog.close()
             return
 
     __index = 0
@@ -284,28 +332,34 @@ def buttonFolderAScan():
                 print(f"DEBUG:__lstIncorrectLocations:{__index}:{__lstIncorrectLocations[__index][0]}:{__lstIncorrectLocations[__index][1]}:{__lstIncorrectLocations[__index][2]}")
             __index += 1
     # Create file Scan_Media_Folder_Wrong_Names.txt
-    pathWN = os.path.join(os.getcwd(), "Scan_Media_Folder_Wrong_Names.txt")
-    fWN = open(pathWN, "w")
+    __fHlog = open(__logFile, 'a')
+    # pathWN = os.path.join(os.getcwd(), "Scan_Media_Folder_Wrong_Names.txt")
+    # fWN = open(pathWN, "w")
     dtNow = datetime.datetime.now()
-    fWN.write(f"Folder scanned:{__folderA}\n")
-    fWN.write(f"Scan date:{dtNow}\n")
-    fWN.write(f"Wrong naming not starting YYYYMM:{len(__incorrectNamingLocations)}\n")
+    __fHlog.write(f"{dtNow}:Folder scanned:{__folderA}\n")
+    __fHlog.write(f"{dtNow}:Scan date\n")
+    __fHlog.write(f"{dtNow}:Wrong naming not starting YYYYMM:{len(__incorrectNamingLocations)}\n")
     if len(__incorrectNamingLocations) > 0:
         textFolderA.insert("end", f"Incorrect Namings found:{len(__incorrectNamingLocations)}\n")
         print(f"Incorrect namings found:{len(__incorrectNamingLocations)}")
+        __fHlog.write(f"{dtNow}:Incorrect namings found:{len(__incorrectNamingLocations)}\n")
         __index = 0
         while __index < len(__incorrectNamingLocations):
             if DEBUG:
                 print(f"DEBUG:__incorrectNamingLocations[{__index}]:{__incorrectNamingLocations[__index]}")
-            fWN.write(f"{__index}:{__incorrectNamingLocations[__index]}\n")
+            __fHlog.write(f"{__index}:{__incorrectNamingLocations[__index]}\n")
             __index += 1
     else:
         print(f"No Incorrect Namings [yyyymmdd_filename] found")
         textFolderA.insert("end", f"No Incorrect Namings [yyyymmdd_filename] found\n")
-    fWN.close()
+        __fHlog.write(f"{dtNow}:No Incorrect Namings [yyyymmdd_filename] found\n")
+    __fHlog.close()
     if len(__incorrectNamingLocations) > 0:
         if messagebox.askyesno("InfoMV", f"{len(__incorrectNamingLocations)} Incorrect namings [yyyymmdd_filename] found , correct ?"):
             print("User requested to correct namings")
+            __fHlog= open(__logFile, 'a')
+            __fHlog.write(f"{dtNow}:User requested to correct namings\n")
+            __fHlog.close()
             __index = 0
             while __index < len(__incorrectNamingLocations):
                 __filePath = os.path.join(__folderA, __incorrectNamingLocations[__index][0])
@@ -313,7 +367,9 @@ def buttonFolderAScan():
                 # Fixing bug , renaming to yearmonth_ , should have been yearmonthday_
                 __checkBugNaming = __incorrectNamingLocations[__index][1][:6] + "_"
                 if __fileName.startswith(__checkBugNaming):
-                    print(f"Found old bug in naming !!")
+                    __fHlog= open(__logFile, 'a')
+                    __fHlog.write(f"{dtNow}:Found old bug in naming !!\n")
+                    __fHlog.close()
                     __fileNameNew = __incorrectNamingLocations[__index][1] + "_" + __fileName[7:]
                 else:
                     __fileNameNew = __incorrectNamingLocations[__index][1] + "_" + __fileName
@@ -328,23 +384,39 @@ def buttonFolderAScan():
                     print(f"DEBUG:Renaming filePathNew[{__index}]:{__filePathNew} ")
                 __question = f"Rename index[{__index + 1}/{len(__incorrectNamingLocations)}]:{__filePath} to {__filePathNew} ? "
                 print(__question)
+                __fHlog= open(__logFile, 'a')
+                __fHlog.write(f"{dtNow}:Asking user to rename:{__filePath} to {__filePathNew}\n")
+                __fHlog.close()
                 __answer = messagebox.askyesnocancel("InfoMV",__question)
                 if __answer == None:
                     print("User aborted to correct namings")
+                    __fHlog= open(__logFile, 'a')
+                    __fHlog.write(f"{dtNow}:User aborted to correct namings\n")
+                    __fHlog.close()
                     textFolderA.insert("end", f"Aborted by user\n")
                     textFolderA.insert("end", f"Thanks for flying scan media folder\n")
                     return
                 else:
                     if __answer:
                         os.rename(__filePath, __filePathNew)
+                        __fHlog= open(__logFile, 'a')
+                        __fHlog.write(f"{dtNow}:Renamed:{__filePath} to {__filePathNew}\n")
+                        __fHlog.close()
                     __index += 1
         else:
             print("User aborted to correct namings")
             print("Thanks for flying scan media folder")
+            __fHlog= open(__logFile, 'a')
+            __fHlog.write(f"{dtNow}:User aborted to correct namings\n")
+            __fHlog.close()
             textFolderA.insert("end", f"Aborted by user\n")
             textFolderA.insert("end", f"Thanks for flying scan media folder\n")
     print("Run completed")
+    __fHlog = open(__logFile, 'a')
+    __fHlog.write(f"{dtNow}:Run completed\n")
+    __fHlog.close()
     textFolderA.insert("end", f"Run completed\n")
+    textFolderA.insert("end", f"Logfile: {__logFile}\n")
     return
 
 def buttonDirDialogFolderA():
@@ -356,6 +428,19 @@ def buttonDirDialogFolderA():
     buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
     textFolderA.delete(1.0, "end")
     textFolderA.insert("end", f"Scan Folder set to: \n{__folder_selected} \n")
+    # Log file existing ?
+    __logFile = os.path.join(__folder_selected, "media_scan_folder.log")
+    if os.path.exists(__logFile):
+        print(f"Log file found: {__logFile}")
+        textFolderA.insert("end", f"Log file found: {__logFile}\n")
+    else:
+        print(f"Log file not found: {__logFile}")
+        textFolderA.insert("end", f"Log file not found: {__logFile}\n")
+        __createLog = messagebox.askyesno("InfoMV", f"Log file not found: {__logFile} \n Create it ?")
+        if __createLog:
+            __logFp = open(__logFile, 'w')
+            __logFp.close()
+            textFolderA.insert("end", f"Log file created: {__logFile}\n")
 
 def getLastestCompFolderA():
     __latestCompFolderAFile = os.path.join(os.getcwd(), "latest_comp_folder.txt")
@@ -379,12 +464,12 @@ def writeLastestCompFolderA(CompFolderA):
     print(f"written {CompFolderA} to {__latestCompFolderAFile}")
     return __latestCompFolderA
 
-def getVerion():
+def getVersion():
     # __versionFile = os.path.join(os.getcwd(), "version_media_scan_folder.txt")
     # __versionFp = open(__versionFile, 'r')
     # __version = __versionFp.readline()
     # return __version
-    return "2.2.1"
+    return "3.0.1"
 
 
 def getListIncorrectLocations(rootFolder, sortedList):
@@ -435,7 +520,7 @@ CheckBFolder = False
 Sorted_Source_list = []
 Sorted_Dest_list = []
 main = tk.Tk()
-__version = getVerion()
+__version = getVersion()
 main.title(f"Media Folder Scan {__version}")
 main.config(bg="#E4E2E2")
 main.geometry("900x694")
