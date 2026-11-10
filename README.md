@@ -16,6 +16,19 @@ If scan runs into files that are not according to this location / naming user is
 
 Make executable with :
 
-py -m pip install pyinstaller
-py -m PyInstaller --onefile --windowed --name MediaFolderScanner .\Scan_media_folder.py`chmod +x MediaFolderScanner.py` and run with `./MediaFolderScanner.py` or `python3 MediaFolderScanner.py`
+Install the runtime dependency first:
 
+```powershell
+py -m pip install -r requirements.txt
+```
+
+Then build the executable:
+
+```powershell
+py -m pip install pyinstaller
+py -m PyInstaller --onefile --windowed --name MediaFolderScanner .\Scan_media_folder.py
+```
+
+Alternatively, run the script directly with `py .\Scan_media_folder.py`.
+
+Version 4.0.1: Added help, ttkbootstrap GUI, and improved performance.

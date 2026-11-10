@@ -3,6 +3,8 @@
 import os
 import pathlib
 import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.widgets.scrolled import ScrolledText
 from os.path import getsize
 from tkinter import filedialog
 from tkinter import messagebox
@@ -26,7 +28,7 @@ def buttonFolderAScan():
     global gl_list_folder_a
     gl_list_folder_a = []
     gl_folder_a_consistent = False
-    buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
+    buttonCheckConsistencyFolderA.configure(bootstyle="primary")
     textFolderA.delete(1.0, "end")
     __folderA = entrySrcFolderA.get()
     __logFile = os.path.join(__folderA, "media_scan_folder_log.txt")
@@ -437,11 +439,13 @@ def buttonFolderAScan():
 
 def buttonDirDialogFolderA():
     __folder_selected = filedialog.askdirectory()
+    if not __folder_selected:
+        return
     entrySrcFolderA.delete(0, tk.END)
     entrySrcFolderA.insert(0, __folder_selected)
     writeLastestCompFolderA(__folder_selected)
     print(f"Scan Folder set to: \n{__folder_selected} \n")
-    buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
+    buttonCheckConsistencyFolderA.configure(bootstyle="primary")
     textFolderA.delete(1.0, "end")
     textFolderA.insert("end", f"Scan Folder set to: \n{__folder_selected} \n")
     # Log file existing ?
@@ -509,7 +513,7 @@ def getVersion():
     # __versionFp = open(__versionFile, 'r')
     # __version = __versionFp.readline()
     # return __version
-    return "3.0.1"
+    return "4.0.1"
 
 
 def getListIncorrectLocations(rootFolder, sortedList):
@@ -559,31 +563,76 @@ CheckAFolder = False
 CheckBFolder = False
 Sorted_Source_list = []
 Sorted_Dest_list = []
-main = tk.Tk()
+main = ttk.Window(themename="flatly")
 __version = getVersion()
 main.title(f"Media Folder Scan {__version}")
-main.config(bg="#E4E2E2")
-main.geometry("900x694")
+main.geometry("960x700")
+main.minsize(720, 520)
+main.columnconfigure(0, weight=1)
+main.rowconfigure(0, weight=1)
 
-entrySrcFolderA = tk.Entry(master=main)
-entrySrcFolderA.config(bg="#fff", fg="#000")
-entrySrcFolderA.place(x=13, y=80, width=275, height=21)
+content = ttk.Frame(main, padding=(28, 24))
+content.grid(row=0, column=0, sticky="nsew")
+content.columnconfigure(0, weight=1)
 
-buttonGetFolderA = tk.Button(master=main, text="Media Folder to Scan", command=buttonDirDialogFolderA)
-buttonGetFolderA.config(bg="#E4E2E2", fg="#000")
-buttonGetFolderA.place(x=170, y=168, height=40)
+ttk.Label(
+    content,
+    text="Media Folder Scanner",
+    font=("Segoe UI", 22, "bold"),
+).grid(row=0, column=0, sticky="w")
+ttk.Label(
+    content,
+    text="Check your media library for duplicates and folder or filename issues.",
+    bootstyle="secondary",
+).grid(row=1, column=0, sticky="w", pady=(4, 20))
 
-textFolderA = tk.Text(master=main)
-textFolderA.config(bg="#fff", fg="#000")
-textFolderA.place(x=13, y=267, width=800, height=340)
+folder_section = ttk.Labelframe(content, text=" Folder to scan ", padding=16)
+folder_section.grid(row=2, column=0, sticky="ew", pady=(0, 16))
+folder_section.columnconfigure(0, weight=1)
 
-buttonCheckConsistencyFolderA = tk.Button(master=main, text="Scan Media Folder", command=lambda:threading.Thread(target=buttonFolderAScan).start())
-buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
-buttonCheckConsistencyFolderA.place(x=15, y=168, height=40)
+entrySrcFolderA = ttk.Entry(master=folder_section)
+entrySrcFolderA.grid(row=0, column=0, sticky="ew", padx=(0, 10), ipady=5)
 
-buttonHelpInfo = tk.Button(master=main, text="   Help    ", command=lambda:threading.Thread(target=buttonHelp).start())
-buttonHelpInfo.config(bg="#E4E2E2", fg="#000")
-buttonHelpInfo.place(x=750, y=168, height=40)
+buttonGetFolderA = ttk.Button(
+    master=folder_section,
+    text="Browse...",
+    command=buttonDirDialogFolderA,
+    bootstyle="secondary-outline",
+)
+buttonGetFolderA.grid(row=0, column=1)
+
+actions = ttk.Frame(content)
+actions.grid(row=3, column=0, sticky="new", pady=(0, 12))
+
+buttonCheckConsistencyFolderA = ttk.Button(
+    master=actions,
+    text="Scan folder",
+    command=lambda: threading.Thread(target=buttonFolderAScan).start(),
+    bootstyle="primary",
+)
+buttonCheckConsistencyFolderA.pack(side="left")
+
+buttonHelpInfo = ttk.Button(
+    master=actions,
+    text="Help",
+    command=buttonHelp,
+    bootstyle="secondary-outline",
+)
+buttonHelpInfo.pack(side="right")
+
+output_section = ttk.Labelframe(content, text=" Scan output ", padding=10)
+output_section.grid(row=4, column=0, sticky="nsew")
+output_section.columnconfigure(0, weight=1)
+output_section.rowconfigure(0, weight=1)
+content.rowconfigure(4, weight=1)
+
+textFolderA = ScrolledText(
+    master=output_section,
+    height=12,
+    wrap="word",
+    font=("Consolas", 10),
+)
+textFolderA.grid(row=0, column=0, sticky="nsew")
 
 if getLastestCompFolderA() is not None:
     entrySrcFolderA.insert(0, getLastestCompFolderA())
