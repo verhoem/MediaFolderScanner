@@ -29,10 +29,13 @@ def buttonFolderAScan():
     buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
     textFolderA.delete(1.0, "end")
     __folderA = entrySrcFolderA.get()
-    __logFile = os.path.join(__folderA, "media_scan_folder.log")
+    __logFile = os.path.join(__folderA, "media_scan_folder_log.txt")
+    __version = getVersion()
+    print(f"Media Folder Scan {__version} started in Folder:{__folderA}")
+    textFolderA.insert("end", f"Media Folder Scan {__version} started in Folder:{__folderA}\n")
     dtNow = datetime.datetime.now()
     __fH = open(__logFile, 'a')
-    __fH.write(f"{dtNow}:Scan started in Folder:{__folderA}\n")
+    __fH.write(f"{dtNow}:MediaScan {__version} started in Folder:{__folderA}\n")
     __fH.close()
     print(f"Scanning Folder {__folderA}")
     __textBox = f"Scanning Folder  {__folderA}\n"
@@ -41,9 +44,14 @@ def buttonFolderAScan():
     __nrSubdirsInFolder = 0
     __ScannedFiles = []
     __ScannedFile = []
+    __ignoredFiles = []
     for root, directories, files in os.walk(__folderA):
         for file in files:
             fileName, fileExtension = os.path.splitext(file)
+            if fileExtension.lower() in [".txt", ".log"]:
+                print(f"Found file to ignore:{fileName}{fileExtension} in {root}")
+                __ignoredFiles.append(os.path.join(root, file))
+                continue
             __nrFilesInFolder += 1
             # print(f"{__nrFilesInFolder}:{directories}:{file}")
             # print(f"filename:{fileName} Extension:{fileExtension}")
@@ -64,11 +72,13 @@ def buttonFolderAScan():
     print(f"NR files found: {__nrFilesInFolder}" )
     print(f"NR subdirs found: {__nrSubdirsInFolder}" )
     print(f"NR files in ScannedFiles: {len(__ScannedFiles)}")
+    print(f"NR ignored files: {len(__ignoredFiles)}")
     dtNow = datetime.datetime.now()
     __fHlog = open(__logFile, 'a')
     __fHlog.write(f"{dtNow}:NR files found: {__nrFilesInFolder}\n")
     __fHlog.write(f"{dtNow}:NR subdirs found: {__nrSubdirsInFolder}\n")
     __fHlog.write(f"{dtNow}:NR files in ScannedFiles: {len(__ScannedFiles)}\n")
+    __fHlog.write(f"{dtNow}:NR ignored files: {len(__ignoredFiles)}\n")
     __fHlog.close()
     __SortedBySize = sorted(__ScannedFiles, key=itemgetter(1))
     # To find duplicate files first find files same sizes before hashing for performance
@@ -80,6 +90,7 @@ def buttonFolderAScan():
         __index += 1
     textFolderA.insert("end", f"NR files found: {__nrFilesInFolder} \n")
     textFolderA.insert("end", f"NR subdirs found: {__nrSubdirsInFolder} \n")
+    textFolderA.insert("end", f"NR ignored files: {len(__ignoredFiles)} \n")
     dtNow = datetime.datetime.now()
     __fHlog = open(__logFile, 'a')
     __fHlog.write(f"{dtNow}:NR files found: {__nrFilesInFolder} \n")
@@ -155,9 +166,10 @@ def buttonFolderAScan():
                 if __SortedBySize[__index][2] == __hash:
                     __filePathTmp = os.path.join(__folderA, __SortedBySize[__index][0])
                     print(f"Duplicate:{__filePathTmp}:{__hash}")
-                    __fHlog.write(f"{__filePathTmp}:{__hash}\n")
+                    __fHlog.write(f"Duplicate:{__filePathTmp}:{__hash}\n")
                 __index += 1
-        textFolderA.insert("end", f"Duplicate hashes found in Folder A Exiting!!\n")
+        textFolderA.insert("end", f"Duplicate hashes found in Folder A Exiting Please remove them and re-run!!\n")
+        textFolderA.insert("end", f"Checkout the log file for more details. {__logFile} \n")
         __fHlog.close()
         gl_folder_a_consistent = True
         return
@@ -237,14 +249,14 @@ def buttonFolderAScan():
     # fWLY.write(f"Scan date:{getTimeStampNow()}\n")
     __fHlog.write(f"Folder scanned:{__folderA}\n")
     __fHlog.write(f"Scan date:{dtNow}\n")
-    __fHlog.write(f"Wrong year locations:{len(__incorrectYearLocations)}\n\n")
+    __fHlog.write(f"Wrong year locations:{len(__incorrectYearLocations)}\n")
     if len(__incorrectYearLocations) > 0:
         textFolderA.insert("end", f"Incorrect Year locations found:{len(__incorrectYearLocations)}\n")
         __index = 0
         while __index < len(__incorrectYearLocations):
             if DEBUG:
                 print(f"DEBUG:{__index}:{__incorrectYearLocations[__index]}")
-            __fHlog.write(f"{__index}:{__incorrectYearLocations[__index]}\n")
+            __fHlog.write(f"Wrong year location {__index}:{__incorrectYearLocations[__index]}\n")
             __index += 1
     else:
         print(f"No Incorrect Year location found")
@@ -347,7 +359,7 @@ def buttonFolderAScan():
         while __index < len(__incorrectNamingLocations):
             if DEBUG:
                 print(f"DEBUG:__incorrectNamingLocations[{__index}]:{__incorrectNamingLocations[__index]}")
-            __fHlog.write(f"{__index}:{__incorrectNamingLocations[__index]}\n")
+            __fHlog.write(f"Incorrect naming {__index}:{__incorrectNamingLocations[__index]}\n")
             __index += 1
     else:
         print(f"No Incorrect Namings [yyyymmdd_filename] found")
@@ -413,6 +425,10 @@ def buttonFolderAScan():
             textFolderA.insert("end", f"Thanks for flying scan media folder\n")
     print("Run completed")
     __fHlog = open(__logFile, 'a')
+    __index = 0
+    while __index < len(__ignoredFiles):
+        __fHlog.write(f"{dtNow}:Ignored file {__index}: {__ignoredFiles[__index]}\n")
+        __index += 1
     __fHlog.write(f"{dtNow}:Run completed\n")
     __fHlog.close()
     textFolderA.insert("end", f"Run completed\n")
@@ -429,7 +445,7 @@ def buttonDirDialogFolderA():
     textFolderA.delete(1.0, "end")
     textFolderA.insert("end", f"Scan Folder set to: \n{__folder_selected} \n")
     # Log file existing ?
-    __logFile = os.path.join(__folder_selected, "media_scan_folder.log")
+    __logFile = os.path.join(__folder_selected, "media_scan_folder_log.txt")
     if os.path.exists(__logFile):
         print(f"Log file found: {__logFile}")
         textFolderA.insert("end", f"Log file found: {__logFile}\n")
@@ -441,6 +457,30 @@ def buttonDirDialogFolderA():
             __logFp = open(__logFile, 'w')
             __logFp.close()
             textFolderA.insert("end", f"Log file created: {__logFile}\n")
+
+def buttonHelp():
+    __helpText = """
+    Media Folder Scan Help
+
+    This tool scans a media folder and checks for the following:
+    1. Duplicate files based on size and hash.
+    2. Incorrect year and month locations based on file modification date.
+    3. Incorrect file naming conventions (should start with YYYYMMDD_).
+
+    Usage:
+    - Select the media folder to scan using the 'Media Folder to Scan' button.
+    - Click 'Scan Media Folder' to start the scan.
+    - The results will be displayed in the text area, and a log file will be created in the selected folder.
+
+    Note:
+    - Ensure that you have write permissions in the selected folder.
+    - The tool will prompt you to correct any issues found during the scan.
+
+    For further assistance, please refer to the documentation or contact support.
+    """
+    messagebox.showinfo("Media Folder Scan Help", __helpText)
+    return
+
 
 def getLastestCompFolderA():
     __latestCompFolderAFile = os.path.join(os.getcwd(), "latest_comp_folder.txt")
@@ -540,6 +580,10 @@ textFolderA.place(x=13, y=267, width=800, height=340)
 buttonCheckConsistencyFolderA = tk.Button(master=main, text="Scan Media Folder", command=lambda:threading.Thread(target=buttonFolderAScan).start())
 buttonCheckConsistencyFolderA.config(bg="#E4E2E2", fg="#000")
 buttonCheckConsistencyFolderA.place(x=15, y=168, height=40)
+
+buttonHelpInfo = tk.Button(master=main, text="   Help    ", command=lambda:threading.Thread(target=buttonHelp).start())
+buttonHelpInfo.config(bg="#E4E2E2", fg="#000")
+buttonHelpInfo.place(x=750, y=168, height=40)
 
 if getLastestCompFolderA() is not None:
     entrySrcFolderA.insert(0, getLastestCompFolderA())
